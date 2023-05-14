@@ -1,0 +1,8 @@
+[tasks.watch]
+command = "cargo"
+args = ["run"]
+watch = true
+
+[tasks.clean]
+command = "cargo"
+args = ["clean"]
