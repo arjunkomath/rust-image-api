@@ -1,27 +1,26 @@
 #[macro_use]
 extern crate rocket;
 
-use std::io::Cursor;
-
+use image::GenericImageView;
+use reqwest::Client;
 use rocket::http::ContentType;
 use rocket::http::Status;
 use rocket::response::Responder;
 use rocket::response::Response;
 use rocket::Request;
-
-use reqwest::Client;
-
-use image::GenericImageView;
+use std::io::Cursor;
 
 struct BytesResponse(Vec<u8>);
 
 impl<'r> Responder<'r, 'static> for BytesResponse {
     fn respond_to(self, _: &'r Request<'_>) -> rocket::response::Result<'static> {
         let bytes = self.0;
+
         Response::build()
             .header(ContentType::PNG)
             .status(Status::Ok)
-            .raw_header("Cache-Control", "max-age=0")
+            .raw_header("ETag", format!("{:x}", md5::compute(&bytes)))
+            .raw_header("Cache-Control", "public, max-age=31536000, immutable")
             .sized_body(bytes.len(), std::io::Cursor::new(bytes))
             .ok()
     }
