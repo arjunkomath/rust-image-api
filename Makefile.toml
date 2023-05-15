@@ -6,3 +6,7 @@ watch = true
 [tasks.clean]
 command = "cargo"
 args = ["clean"]
+
+[tasks.check]
+command = "cargo"
+args = ["check"]

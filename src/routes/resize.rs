@@ -1,24 +1,36 @@
-use image::GenericImageView;
+use image::{DynamicImage, GenericImageView};
 use reqwest::Client;
-use rocket::http::ContentType;
-use rocket::http::Status;
-use rocket::response::Responder;
-use rocket::response::Response;
-use rocket::Request;
+use rocket::{
+    http::{ContentType, Status},
+    response::{Responder, Response, Result},
+    Request,
+};
 use std::io::Cursor;
 
 pub struct BytesResponse(Vec<u8>);
 
 impl<'r> Responder<'r, 'static> for BytesResponse {
-    fn respond_to(self, _: &'r Request<'_>) -> rocket::response::Result<'static> {
+    fn respond_to(self, req: &'r Request<'_>) -> Result<'static> {
         let bytes = self.0;
+
+        let etag_value = format!("{:x}", md5::compute(&bytes));
+
+        // Check if the request's ETag matches the current ETag
+        if req.headers().contains("If-None-Match") {
+            let if_none_match = req.headers().get("If-None-Match").next().unwrap_or("");
+            if if_none_match == etag_value {
+                return Response::build()
+                    .status(Status::NotModified)
+                    .raw_header("ETag", etag_value)
+                    .ok();
+            }
+        }
 
         Response::build()
             .header(ContentType::PNG)
             .status(Status::Ok)
-            .raw_header("ETag", format!("{:x}", md5::compute(&bytes)))
             .raw_header("Cache-Control", "public, max-age=31536000, immutable")
-            .sized_body(bytes.len(), std::io::Cursor::new(bytes))
+            .sized_body(bytes.len(), Cursor::new(bytes))
             .ok()
     }
 }
