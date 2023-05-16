@@ -31,7 +31,7 @@ pub async fn resize_by_width(
         let resized_image = image.resize_exact(
             image_width,
             new_height,
-            image::imageops::FilterType::Lanczos3,
+            image::imageops::FilterType::Nearest,
         );
 
         if let Ok(result) = ImageHelper::new(resized_image).png_response() {
@@ -63,7 +63,7 @@ pub async fn resize_by_height(
         let resized_image = image.resize_exact(
             new_width,
             image_height,
-            image::imageops::FilterType::Lanczos3,
+            image::imageops::FilterType::Nearest,
         );
 
         if let Ok(result) = ImageHelper::new(resized_image).png_response() {
