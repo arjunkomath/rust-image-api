@@ -15,19 +15,30 @@ pub async fn get_image_from_url(url: &str) -> anyhow::Result<DynamicImage> {
     Ok(image)
 }
 
-pub fn image_response(image: DynamicImage) -> anyhow::Result<HttpResponse> {
-    let mut bytes = Vec::new();
-    image.write_to(&mut Cursor::new(&mut bytes), image::ImageOutputFormat::Png)?;
+pub struct ImageHelper {
+    image: DynamicImage,
+}
 
-    let etag_value = format!("{:x}", md5::compute(&bytes));
+impl ImageHelper {
+    pub fn new(image: DynamicImage) -> Self {
+        Self { image }
+    }
 
-    Ok(HttpResponse::Ok()
-        .content_type(ContentType::png())
-        .insert_header(CacheControl(vec![CacheDirective::MaxAge(360u32)]))
-        .insert_header(ETag(EntityTag::new_strong(etag_value.to_owned())))
-        .insert_header(IfNoneMatch::Items(vec![EntityTag::new(
-            false,
-            etag_value.to_owned(),
-        )]))
-        .body(bytes))
+    pub fn png_response(&self) -> anyhow::Result<HttpResponse> {
+        let mut bytes = Vec::new();
+        self.image
+            .write_to(&mut Cursor::new(&mut bytes), image::ImageOutputFormat::Png)?;
+
+        let etag_value = format!("{:x}", md5::compute(&bytes));
+
+        Ok(HttpResponse::Ok()
+            .content_type(ContentType::png())
+            .insert_header(CacheControl(vec![CacheDirective::MaxAge(360u32)]))
+            .insert_header(ETag(EntityTag::new_strong(etag_value.to_owned())))
+            .insert_header(IfNoneMatch::Items(vec![EntityTag::new(
+                false,
+                etag_value.to_owned(),
+            )]))
+            .body(bytes))
+    }
 }

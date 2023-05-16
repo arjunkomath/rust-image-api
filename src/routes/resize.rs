@@ -1,4 +1,4 @@
-use crate::utils::http::{get_image_from_url, image_response};
+use crate::utils::http::ImageHelper;
 use actix_web::{
     get,
     http::header::{CacheControl, CacheDirective},
@@ -19,7 +19,7 @@ pub async fn resize_by_width(
 ) -> impl Responder {
     let image_width = width.into_inner();
 
-    if let Ok(image) = get_image_from_url(&query.url).await {
+    if let Ok(image) = crate::utils::http::get_image_from_url(&query.url).await {
         // Get the original dimensions
         let (original_width, original_height) = image.dimensions();
 
@@ -34,7 +34,7 @@ pub async fn resize_by_width(
             image::imageops::FilterType::Lanczos3,
         );
 
-        if let Ok(result) = image_response(resized_image) {
+        if let Ok(result) = ImageHelper::new(resized_image).png_response() {
             return result;
         }
     }
@@ -51,7 +51,7 @@ pub async fn resize_by_height(
 ) -> impl Responder {
     let image_height = height.into_inner();
 
-    if let Ok(image) = get_image_from_url(&query.url).await {
+    if let Ok(image) = crate::utils::http::get_image_from_url(&query.url).await {
         // Get the original dimensions
         let (original_width, original_height) = image.dimensions();
 
@@ -66,7 +66,7 @@ pub async fn resize_by_height(
             image::imageops::FilterType::Lanczos3,
         );
 
-        if let Ok(result) = image_response(resized_image) {
+        if let Ok(result) = ImageHelper::new(resized_image).png_response() {
             return result;
         }
     }

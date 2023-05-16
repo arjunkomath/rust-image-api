@@ -16,11 +16,17 @@ async fn hello() -> impl Responder {
     ")
 }
 
+#[get("/health")]
+async fn health() -> impl Responder {
+    HttpResponse::Ok().body("success")
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .service(hello)
+            .service(health)
             .service(routes::resize::resize_by_width)
             .service(routes::resize::resize_by_height)
     })
