@@ -2,6 +2,7 @@
 extern crate rocket;
 
 mod routes;
+mod utils;
 
 #[get("/")]
 fn index() -> &'static str {
