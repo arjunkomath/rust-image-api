@@ -828,6 +828,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "image-api"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "anyhow",
+ "image",
+ "md5",
+ "reqwest",
+ "serde",
+]
+
+[[package]]
 name = "indexmap"
 version = "1.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1379,18 +1391,6 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "winreg",
-]
-
-[[package]]
-name = "rust-image-api"
-version = "0.1.0"
-dependencies = [
- "actix-web",
- "anyhow",
- "image",
- "md5",
- "reqwest",
- "serde",
 ]
 
 [[package]]
