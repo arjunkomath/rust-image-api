@@ -5,17 +5,17 @@ This project is in an early stage and is in beta, this hasn't been production te
 
 ## Usage
 
-### GET /image/w/<max-width>?url=<image-url>
+### GET `/image/w/<max-width>?url=<image-url>`
 resize and serve the image from `<image-url>` to `<max-width>` pixels wide, without changing the aspect ratio
 
-### GET /image/h/<max-height>?url=<image-url>
+### GET `/image/h/<max-height>?url=<image-url>`
 resize and serve the image from `<image-url>` to `<max-height>` pixels tall, without changing the aspect ratio
       
-### GET /image/convert/<format>?url=<image-url>
+### GET `/image/convert/<format>?url=<image-url>`
 convert and serve the image from `<image-url>` to `<format>` format
 format: png, jpeg, webp
 
-Example: https://rust-image-api-production.up.railway.app/image/w/240?url=https://push.techulus.com/images/logo.png
+Example: https://rust-image-api-production.up.railway.app/v1/resize/w/240?url=https://push.techulus.com/images/logo.png
 
 ## Development
 
