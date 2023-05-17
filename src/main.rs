@@ -21,6 +21,16 @@ async fn hello() -> impl Responder {
       GET /v1/convert/<format>?url=<image-url>
         convert and serve the image from `<image-url>` to `<format>` format
         format: png, jpeg, webp
+
+      GET /v1/flip/<orientation>?url=<image-url>
+        flip image from `<image-url>` to `<orientation>` orientation
+        orientation: horizontal, vertical
+
+      GET /v1/grayscale?url=<image-url>
+        convert image from `<image-url>` to grayscale
+
+      GET /v1/blur/<sigma>?url=<image-url>
+        blur image from `<image-url>` with `<sigma>` sigma (this is a slow endpoint and could potentially timeout)
     ")
 }
 
@@ -46,7 +56,10 @@ async fn main() -> std::io::Result<()> {
                             .service(routes::resize::resize_by_width)
                             .service(routes::resize::resize_by_height),
                     )
-                    .service(routes::convert::convert_type),
+                    .service(routes::convert::convert_type)
+                    .service(routes::flip::flip_orientation)
+                    .service(routes::blur::blur_image)
+                    .service(routes::grayscale::grayscale),
             );
 
         app
