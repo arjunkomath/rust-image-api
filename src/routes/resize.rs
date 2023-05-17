@@ -1,18 +1,12 @@
-use crate::utils::http::ImageHelper;
+use crate::utils::http::{ImageHelper, ImageSource};
 use actix_web::{
     get,
     http::header::{CacheControl, CacheDirective},
     web, HttpResponse, Responder,
 };
 use image::GenericImageView;
-use serde::Deserialize;
 
-#[derive(Deserialize)]
-pub struct ImageSource {
-    url: String,
-}
-
-#[get("/image/w/{width}")]
+#[get("/w/{width}")]
 pub async fn resize_by_width(
     width: web::Path<u32>,
     query: web::Query<ImageSource>,
@@ -31,7 +25,7 @@ pub async fn resize_by_width(
         let resized_image = image.resize_exact(
             image_width,
             new_height,
-            image::imageops::FilterType::Nearest,
+            image::imageops::FilterType::Triangle,
         );
 
         if let Ok(result) = ImageHelper::new(resized_image).png_response() {
@@ -44,7 +38,7 @@ pub async fn resize_by_width(
         .body(Vec::new())
 }
 
-#[get("/image/h/{height}")]
+#[get("/h/{height}")]
 pub async fn resize_by_height(
     height: web::Path<u32>,
     query: web::Query<ImageSource>,
@@ -63,7 +57,7 @@ pub async fn resize_by_height(
         let resized_image = image.resize_exact(
             new_width,
             image_height,
-            image::imageops::FilterType::Nearest,
+            image::imageops::FilterType::Triangle,
         );
 
         if let Ok(result) = ImageHelper::new(resized_image).png_response() {
