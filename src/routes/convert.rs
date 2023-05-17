@@ -1,9 +1,5 @@
 use crate::utils::http::{ImageHelper, ImageSource};
-use actix_web::{
-    get,
-    http::header::{CacheControl, CacheDirective},
-    web, HttpResponse, Responder,
-};
+use actix_web::{get, web, Responder};
 
 #[get("/convert/{format}")]
 pub async fn convert_type(
@@ -33,7 +29,5 @@ pub async fn convert_type(
         }
     }
 
-    HttpResponse::Ok()
-        .insert_header(CacheControl(vec![CacheDirective::NoCache]))
-        .body(Vec::new())
+    crate::utils::http::empty_response()
 }

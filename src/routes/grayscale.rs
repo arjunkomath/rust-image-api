@@ -1,9 +1,5 @@
 use crate::utils::http::{ImageHelper, ImageSource};
-use actix_web::{
-    get,
-    http::header::{CacheControl, CacheDirective},
-    web, HttpResponse, Responder,
-};
+use actix_web::{get, web, Responder};
 
 #[get("/grayscale")]
 pub async fn grayscale(query: web::Query<ImageSource>) -> impl Responder {
@@ -15,7 +11,5 @@ pub async fn grayscale(query: web::Query<ImageSource>) -> impl Responder {
         }
     }
 
-    HttpResponse::Ok()
-        .insert_header(CacheControl(vec![CacheDirective::NoCache]))
-        .body(Vec::new())
+    crate::utils::http::empty_response()
 }

@@ -1,9 +1,5 @@
 use crate::utils::http::{ImageHelper, ImageSource};
-use actix_web::{
-    get,
-    http::header::{CacheControl, CacheDirective},
-    web, HttpResponse, Responder,
-};
+use actix_web::{get, web, Responder};
 use image::GenericImageView;
 
 #[get("/w/{width}")]
@@ -33,9 +29,7 @@ pub async fn resize_by_width(
         }
     }
 
-    HttpResponse::Ok()
-        .insert_header(CacheControl(vec![CacheDirective::NoCache]))
-        .body(Vec::new())
+    crate::utils::http::empty_response()
 }
 
 #[get("/h/{height}")]
@@ -65,7 +59,5 @@ pub async fn resize_by_height(
         }
     }
 
-    HttpResponse::Ok()
-        .insert_header(CacheControl(vec![CacheDirective::NoCache]))
-        .body(Vec::new())
+    crate::utils::http::empty_response()
 }

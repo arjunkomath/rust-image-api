@@ -16,6 +16,12 @@ pub async fn get_image_from_url(url: &str) -> anyhow::Result<DynamicImage> {
     Ok(image)
 }
 
+pub fn empty_response() -> HttpResponse {
+    HttpResponse::Ok()
+        .insert_header(CacheControl(vec![CacheDirective::NoCache]))
+        .body(Vec::new())
+}
+
 #[derive(Deserialize)]
 pub struct ImageSource {
     pub url: String,
