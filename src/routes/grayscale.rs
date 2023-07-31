@@ -15,4 +15,5 @@ pub async fn grayscale(query: web::Query<ImageSource>) -> Result<HttpResponse, E
         format: ImageFormat::Png,
     }
     .try_into()
+    .map_err(|_| EmptyResponse {})
 }
