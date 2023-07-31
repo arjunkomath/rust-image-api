@@ -4,9 +4,7 @@ use image::ImageFormat;
 
 #[get("/grayscale")]
 pub async fn grayscale(query: web::Query<ImageSource>) -> Result<HttpResponse, EmptyResponse> {
-    let image = crate::utils::http::get_image_from_url(&query.url)
-        .await
-        .map_err(|_| EmptyResponse {})?;
+    let image = crate::utils::http::get_image_from_url(&query.url).await?;
 
     let image = image.grayscale();
 
@@ -15,5 +13,4 @@ pub async fn grayscale(query: web::Query<ImageSource>) -> Result<HttpResponse, E
         format: ImageFormat::Png,
     }
     .try_into()
-    .map_err(|_| EmptyResponse {})
 }

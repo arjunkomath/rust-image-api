@@ -9,9 +9,7 @@ pub async fn resize_by_width(
 ) -> Result<HttpResponse, EmptyResponse> {
     let image_width = width.into_inner();
 
-    let image = crate::utils::http::get_image_from_url(&query.url)
-        .await
-        .map_err(|_| EmptyResponse {})?;
+    let image = crate::utils::http::get_image_from_url(&query.url).await?;
 
     // Get the original dimensions
     let (original_width, original_height) = image.dimensions();
@@ -40,9 +38,7 @@ pub async fn resize_by_height(
 ) -> Result<HttpResponse, EmptyResponse> {
     let image_height = height.into_inner();
 
-    let image = crate::utils::http::get_image_from_url(&query.url)
-        .await
-        .map_err(|_| EmptyResponse {})?;
+    let image = crate::utils::http::get_image_from_url(&query.url).await?;
 
     // Get the original dimensions
     let (original_width, original_height) = image.dimensions();

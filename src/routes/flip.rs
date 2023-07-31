@@ -8,9 +8,7 @@ pub async fn flip_orientation(
 ) -> Result<HttpResponse, EmptyResponse> {
     let orientation = orientation.into_inner();
 
-    let image = crate::utils::http::get_image_from_url(&query.url)
-        .await
-        .map_err(|_| EmptyResponse {})?;
+    let image = crate::utils::http::get_image_from_url(&query.url).await?;
 
     let image = match orientation.as_str() {
         "horizontal" => image.fliph(),

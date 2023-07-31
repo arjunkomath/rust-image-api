@@ -8,10 +8,7 @@ pub async fn blur_image(
 ) -> Result<HttpResponse, EmptyResponse> {
     let sigma = sigma.into_inner();
 
-    let image = crate::utils::http::get_image_from_url(&query.url)
-        .await
-        .map_err(|_| EmptyResponse {})?;
-
+    let image = crate::utils::http::get_image_from_url(&query.url).await?;
     let image = image.blur(sigma as f32);
 
     ImageResponse {

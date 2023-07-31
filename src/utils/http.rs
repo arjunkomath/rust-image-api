@@ -32,6 +32,12 @@ impl std::fmt::Display for EmptyResponse {
     }
 }
 
+impl From<anyhow::Error> for EmptyResponse {
+    fn from(_: anyhow::Error) -> Self {
+        EmptyResponse {}
+    }
+}
+
 impl error::ResponseError for EmptyResponse {
     fn error_response(&self) -> HttpResponse<BoxBody> {
         HttpResponse::Ok()
