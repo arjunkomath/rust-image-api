@@ -3,7 +3,7 @@
 #
 # Use official rust image to for application build
 # ---------------------------------------------------
-FROM rust:1.66.1 as build
+FROM rust:latest as build
 
 # Setup working directory
 WORKDIR /usr/src/image-api
