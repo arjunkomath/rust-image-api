@@ -44,7 +44,7 @@ async fn health() -> impl Responder {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
-        let app = App::new()
+        App::new()
             .wrap(middleware::Logger::default())
             .wrap(middleware::DefaultHeaders::new().add(("X-Version", env!("CARGO_PKG_VERSION"))))
             .service(hello)
@@ -60,9 +60,7 @@ async fn main() -> std::io::Result<()> {
                     .service(routes::flip::flip_orientation)
                     .service(routes::blur::blur_image)
                     .service(routes::grayscale::grayscale),
-            );
-
-        app
+            )
     })
     .bind(("0.0.0.0", 8080))?
     .run()
