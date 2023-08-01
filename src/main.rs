@@ -51,6 +51,7 @@ async fn main() -> std::io::Result<()> {
             .service(health)
             .service(
                 web::scope("/v1")
+                    .wrap(utils::middleware::ImageParser)
                     .service(
                         web::scope("/resize")
                             .service(routes::resize::resize_by_width)

@@ -2,25 +2,51 @@ use actix_web::{
     body::BoxBody,
     error,
     http::header::{CacheControl, CacheDirective, ContentType, ETag, EntityTag, IfNoneMatch},
-    HttpResponse,
+    FromRequest, HttpMessage, HttpResponse,
 };
 use image::{DynamicImage, ImageFormat};
 use reqwest::Client;
 use serde::Deserialize;
-use std::io::Cursor;
+use std::{
+    future::{ready, Ready},
+    io::Cursor,
+};
 
-pub async fn get_image_from_url(url: &str) -> anyhow::Result<DynamicImage> {
-    let client = Client::new();
-    let response = client.get(url).send().await?;
-    let bytes = response.bytes().await?;
-    let image = image::load_from_memory(&bytes)?;
-
-    Ok(image)
-}
-
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct ImageSource {
     pub url: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct ImagePayload {
+    pub image: DynamicImage,
+}
+
+impl ImagePayload {
+    pub async fn from_url(url: &str) -> anyhow::Result<Self> {
+        let client = Client::new();
+        let response = client.get(url).send().await?;
+        let bytes = response.bytes().await?;
+        let image = image::load_from_memory(&bytes)?;
+
+        Ok(ImagePayload { image })
+    }
+}
+
+impl FromRequest for ImagePayload {
+    type Error = EmptyResponse;
+    type Future = Ready<Result<Self, Self::Error>>;
+
+    fn from_request(req: &actix_web::HttpRequest, _: &mut actix_web::dev::Payload) -> Self::Future {
+        let value = req.extensions().get::<ImagePayload>().cloned();
+
+        let result = match value {
+            Some(v) => Ok(v),
+            None => Err(EmptyResponse {}),
+        };
+
+        ready(result)
+    }
 }
 
 #[derive(Debug)]

@@ -1,30 +1,28 @@
-use crate::utils::http::{EmptyResponse, ImageResponse, ImageSource};
+use crate::utils::http::{EmptyResponse, ImagePayload, ImageResponse};
 use actix_web::{get, web, HttpResponse, Result};
 
 #[get("/convert/{format}")]
 pub async fn convert_type(
     format: web::Path<String>,
-    query: web::Query<ImageSource>,
+    payload: ImagePayload,
 ) -> Result<HttpResponse, EmptyResponse> {
     let format = format.into_inner();
 
-    let image = crate::utils::http::get_image_from_url(&query.url).await?;
-
     match format.as_str() {
         "png" => ImageResponse {
-            data: image,
+            data: payload.image,
             format: image::ImageFormat::Png,
         },
         "jpeg" => ImageResponse {
-            data: image,
+            data: payload.image,
             format: image::ImageFormat::Jpeg,
         },
         "webp" => ImageResponse {
-            data: image,
+            data: payload.image,
             format: image::ImageFormat::WebP,
         },
         _ => ImageResponse {
-            data: image,
+            data: payload.image,
             format: image::ImageFormat::Png,
         },
     }

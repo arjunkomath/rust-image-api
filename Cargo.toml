@@ -10,3 +10,4 @@ image = { version = "0.24.6", features = ["png", "jpeg", "webp-encoder"] }
 md5 = "0.7.0"
 anyhow = "1.0.71"
 serde = { version = "1.0.163", features = ["derive"] }
+futures-util = "0.3.28"
