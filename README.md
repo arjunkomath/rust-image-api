@@ -5,6 +5,8 @@ This project is in an early stage and is in beta, this hasn't been production te
 
 Example: https://rust-image-api.fly.dev/v1/resize/w/240?url=https://push.techulus.com/images/logo.png
 
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/zHlq1G?referralCode=rXEVYY)
+
 ## Usage
 
 ### `GET /v1/resize/w/<max-width>?url=<image-url>`
