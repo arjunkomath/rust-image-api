@@ -29,6 +29,9 @@ async fn hello() -> impl Responder {
       GET /v1/grayscale?url=<image-url>
         convert image from `<image-url>` to grayscale
 
+      GET /v1/brighten/<value>?url=<image-url>
+        brighten image from `<image-url>` by `<value>`, negative values decrease the brightness and positive values increase it
+
       GET /v1/blur/<sigma>?url=<image-url>
         blur image from `<image-url>` with `<sigma>` sigma (this is a slow endpoint and could potentially timeout)
     ")
@@ -60,7 +63,8 @@ async fn main() -> std::io::Result<()> {
                     .service(routes::convert::convert_type)
                     .service(routes::flip::flip_orientation)
                     .service(routes::blur::blur_image)
-                    .service(routes::grayscale::grayscale),
+                    .service(routes::grayscale::grayscale)
+                    .service(routes::brighten::brighten),
             )
     })
     .bind(("0.0.0.0", 8080))?
