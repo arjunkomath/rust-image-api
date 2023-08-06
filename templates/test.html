@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+    img {
+      max-height: 400px;
+    }
+    </style>
+  </head>
+  <body class="container mx-auto py-4">
+    <h1 class="text-3xl font-bold underline">
+      Image API tests
+    </h1>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div><img src="/v1/resize/w/125?url=https://push.techulus.com/images/logo.png"/></div>
+      <div><img src="/v1/resize/h/125?url=https://push.techulus.com/images/logo.png"/></div>
+
+      <div><img src="/v1/flip/horizontal?url=https://push.techulus.com/images/logo.png"/></div>
+      <div><img src="/v1/flip/vertical?url=https://push.techulus.com/images/logo.png"/></div>
+
+      <div><img src="/v1/grayscale?url=https://push.techulus.com/images/logo.png"/></div>
+      <div><img src="/v1/brighten/125?url=https://push.techulus.com/images/logo.png"/></div>
+
+      <div><img src="/v1/convert/webp?url=https://push.techulus.com/images/logo.png"/></div>
+      <div><img src="/v1/convert/jpeg?url=https://push.techulus.com/images/logo.png"/></div>
+
+      <div><img src="/v1/blur/25?url=https://push.techulus.com/images/logo.png"/></div>
+    </div>
+  </body>
+</html>

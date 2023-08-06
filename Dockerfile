@@ -27,6 +27,9 @@ FROM gcr.io/distroless/cc-debian11
 # Application files
 COPY --from=build /usr/local/cargo/bin/image-api /usr/local/bin/image-api
 
+# Copy the templates folder into the container
+COPY templates /templates
+
 EXPOSE 8080
 
 CMD ["image-api"]

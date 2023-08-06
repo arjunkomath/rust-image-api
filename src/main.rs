@@ -1,6 +1,7 @@
 mod routes;
 mod utils;
 
+use actix_files as fs;
 use actix_web::{
     get,
     http::header::{CacheControl, CacheDirective},
@@ -44,6 +45,12 @@ async fn health() -> impl Responder {
         .body("success")
 }
 
+#[get("/test")]
+async fn test() -> impl Responder {
+    fs::NamedFile::open("templates/test.html")
+        .unwrap_or_else(|_| panic!("Failed to open the HTML file"))
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
@@ -52,6 +59,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::DefaultHeaders::new().add(("X-Version", env!("CARGO_PKG_VERSION"))))
             .service(hello)
             .service(health)
+            .service(test)
             .service(
                 web::scope("/v1")
                     .wrap(utils::middleware::ImageParser)
