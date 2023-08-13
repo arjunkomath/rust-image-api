@@ -28,11 +28,17 @@ orientation: horizontal, vertical
 #### `GET /v1/grayscale?url=<image-url>`
 convert image from `<image-url>` to grayscale
 
+#### `GET /v1/invert?url=<image-url>`
+invert image from `<image-url>`
+
 #### `GET /v1/brighten/<value>?url=<image-url>`
 brighten image from `<image-url>` by `<value>`, negative values decrease the brightness and positive values increase it
 
 #### `GET /v1/blur/<sigma>?url=<image-url>`
 blur image from `<image-url>` with `<sigma>` sigma (this is a slow endpoint and could potentially timeout)
+
+#### `GET /v1/rotate/<deg>?url=<image-url>`
+rotate image from `<image-url>` by `<deg>` degrees, degree can be 90, 180, 270
 
 ## Development
 

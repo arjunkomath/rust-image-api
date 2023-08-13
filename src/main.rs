@@ -7,6 +7,7 @@ use actix_web::{
     http::header::{CacheControl, CacheDirective},
     middleware, web, App, HttpResponse, HttpServer, Responder,
 };
+use anyhow::Result;
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -52,7 +53,14 @@ async fn test() -> impl Responder {
 }
 
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> Result<()> {
+    let port: u16 = std::env::var("PORT")
+        .unwrap_or("8080".to_string())
+        .parse()
+        .unwrap_or(8080);
+
+    println!("Starting image server on port {}", port);
+
     HttpServer::new(|| {
         App::new()
             .wrap(middleware::Logger::default())
@@ -72,10 +80,14 @@ async fn main() -> std::io::Result<()> {
                     .service(routes::flip::flip_orientation)
                     .service(routes::blur::blur_image)
                     .service(routes::grayscale::grayscale)
-                    .service(routes::brighten::brighten),
+                    .service(routes::invert::invert)
+                    .service(routes::brighten::brighten)
+                    .service(routes::rotate::rotate),
             )
     })
-    .bind(("0.0.0.0", 8080))?
+    .bind(("0.0.0.0", port))?
     .run()
-    .await
+    .await?;
+
+    Ok(())
 }
