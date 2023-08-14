@@ -1,4 +1,4 @@
-# Image API (beta) 
+# Image API
 
 [![Build](https://github.com/arjunkomath/rust-image-api/actions/workflows/build.yml/badge.svg)](https://github.com/arjunkomath/rust-image-api/actions/workflows/build.yml)
 
