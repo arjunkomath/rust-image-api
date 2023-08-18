@@ -6,3 +6,4 @@ pub mod grayscale;
 pub mod invert;
 pub mod resize;
 pub mod rotate;
+pub mod unsharpen;
