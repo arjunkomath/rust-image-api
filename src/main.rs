@@ -19,6 +19,9 @@ async fn hello() -> impl Responder {
 
       GET /v1/resize/h/<max-height>?url=<image-url>
         resize image to `<max-height>` pixels tall, without changing the aspect ratio
+
+      GET /v1/crop/<x>/<y>/<width>/<height>?url=<image-url>
+        crop image to `<width>`x`<height>` pixels, starting from position (`<x>`, `<y>`)
       
       GET /v1/convert/<format>?url=<image-url>
         convert image to `<format>` format
@@ -86,6 +89,7 @@ async fn main() -> Result<()> {
                             .service(routes::resize::resize_by_height),
                     )
                     .service(routes::convert::convert_type)
+                    .service(routes::crop::crop_image)
                     .service(routes::flip::flip_orientation)
                     .service(routes::blur::blur_image)
                     .service(routes::grayscale::grayscale)

@@ -1,6 +1,7 @@
 pub mod blur;
 pub mod brighten;
 pub mod convert;
+pub mod crop;
 pub mod flip;
 pub mod grayscale;
 pub mod invert;
