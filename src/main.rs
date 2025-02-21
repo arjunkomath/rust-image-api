@@ -48,6 +48,9 @@ async fn hello() -> impl Responder {
 
       GET /v1/unsharpen/<sigma>/<threshold>?url=<image-url>
         unsharpen image, sigma is the amount to blur the image by, threshold is a control of how much to sharpen
+
+      GET /v1/next?url=<image-url>&w=<width>&h=<height>
+        resize image to `<width>`x`<height>` pixels, without changing the aspect ratio
     ")
 }
 
@@ -96,7 +99,8 @@ async fn main() -> Result<()> {
                     .service(routes::invert::invert)
                     .service(routes::brighten::brighten)
                     .service(routes::unsharpen::unsharpen)
-                    .service(routes::rotate::rotate),
+                    .service(routes::rotate::rotate)
+                    .service(routes::next_image::next_image),
             )
     })
     .bind(("0.0.0.0", port))?

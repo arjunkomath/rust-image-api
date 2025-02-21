@@ -8,3 +8,4 @@ pub mod invert;
 pub mod resize;
 pub mod rotate;
 pub mod unsharpen;
+pub mod next_image;
