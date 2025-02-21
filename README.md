@@ -3,7 +3,6 @@
 [![Build](https://github.com/arjunkomath/rust-image-api/actions/workflows/build.yml/badge.svg)](https://github.com/arjunkomath/rust-image-api/actions/workflows/build.yml)
 
 A fast image manipulation API that can modify images on the fly.
-This project is in an early stage and is in beta, this hasn't been production tested yet.
 
 Example: https://rust-image-api.fly.dev/v1/resize/w/240?url=https://push.techulus.com/images/logo.png
 

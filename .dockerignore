@@ -1,4 +1,7 @@
-/target
 .git
 .gitignore
+target
+Dockerfile
+.dockerignore
+README.md
 fly.toml

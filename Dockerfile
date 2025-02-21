@@ -1,24 +1,22 @@
 # ---------------------------------------------------
 # 1 - Build Stage
-#
-# Use official rust image to for application build
 # ---------------------------------------------------
-FROM rust:latest as build
+FROM rust:1.85 as build
 
-# Setup working directory
 WORKDIR /usr/src/image-api
 COPY . .
 
-# Build application
 RUN cargo install --path .
 
 # ---------------------------------------------------
 # 2 - Deploy Stage
-#
-# Use a distroless image for minimal container size
-# - Copy application files into the image
 # ---------------------------------------------------
-FROM gcr.io/distroless/cc-debian11
+FROM debian:bookworm-slim
+
+RUN apt-get update && apt-get install -y \
+    libssl-dev \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set the architecture argument (arm64, i.e. aarch64 as default)
 # For amd64, i.e. x86_64, you can append a flag when invoking the build `... --build-arg "ARCH=x86_64"`
