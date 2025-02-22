@@ -1,8 +1,9 @@
-use crate::utils::http::{EmptyResponse, ImagePayload, ImageResponse};
-use actix_web::{get, web, HttpResponse, Result};
+use crate::utils::http::{auto_image_format, EmptyResponse, ImagePayload, ImageResponse};
+use actix_web::{get, web, HttpRequest, HttpResponse, Result};
 
 #[get("/rotate/{deg}")]
-pub async fn rotate(
+pub async fn handler(
+    req: HttpRequest,
     deg: web::Path<String>,
     payload: ImagePayload,
 ) -> Result<HttpResponse, EmptyResponse> {
@@ -17,7 +18,7 @@ pub async fn rotate(
 
     ImageResponse {
         data: image,
-        format: image::ImageFormat::Png,
+        format: auto_image_format(&req),
     }
     .try_into()
 }

@@ -1,5 +1,5 @@
-use crate::utils::http::{EmptyResponse, ImagePayload, ImageResponse};
-use actix_web::{get, web, HttpResponse, Result};
+use crate::utils::http::{auto_image_format, EmptyResponse, ImagePayload, ImageResponse};
+use actix_web::{get, web, HttpRequest, HttpResponse, Result};
 use image::GenericImageView;
 use serde::Deserialize;
 
@@ -10,7 +10,8 @@ struct ResizeOptions {
 }
 
 #[get("/next")]
-pub async fn next_image(
+pub async fn handler(
+    req: HttpRequest,
     options: web::Query<ResizeOptions>,
     payload: ImagePayload,
 ) -> Result<HttpResponse, EmptyResponse> {
@@ -42,7 +43,7 @@ pub async fn next_image(
 
     ImageResponse {
         data: resized_image,
-        format: image::ImageFormat::Png,
+        format: auto_image_format(&req),
     }
     .try_into()
 }

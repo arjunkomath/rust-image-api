@@ -1,15 +1,15 @@
-use crate::utils::http::{EmptyResponse, ImagePayload, ImageResponse};
-use actix_web::{get, web, HttpResponse};
-use image::ImageFormat;
+use crate::utils::http::{auto_image_format, EmptyResponse, ImagePayload, ImageResponse};
+use actix_web::{get, web, HttpRequest, HttpResponse};
 
 #[get("/brighten/{value}")]
-pub async fn brighten(
+pub async fn handler(
+    req: HttpRequest,
     payload: ImagePayload,
     value: web::Path<i32>,
 ) -> Result<HttpResponse, EmptyResponse> {
     ImageResponse {
         data: payload.image.brighten(value.into_inner()),
-        format: ImageFormat::Png,
+        format: auto_image_format(&req),
     }
     .try_into()
 }

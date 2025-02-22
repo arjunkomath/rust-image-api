@@ -45,6 +45,10 @@ GET /v1/rotate/<deg>?url=<image-url>
 
 GET /v1/unsharpen/<sigma>/<threshold>?url=<image-url>
     unsharpen image, sigma is the amount to blur the image by, threshold is a control of how much to sharpen.
+
+GET /v1/next?url=<image-url>&w=<width>&h=<height>
+    resize image to `<width>`x`<height>` pixels, without changing the aspect ratio,
+    can be used as a replacement for Next.js Image optimization
 ```
 
 ## Development

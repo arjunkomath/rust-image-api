@@ -2,7 +2,7 @@ use actix_web::{
     body::BoxBody,
     error,
     http::header::{CacheControl, CacheDirective, ContentType, ETag, EntityTag, IfNoneMatch},
-    FromRequest, HttpMessage, HttpResponse,
+    FromRequest, HttpMessage, HttpRequest, HttpResponse,
 };
 use image::{DynamicImage, ImageFormat};
 use reqwest::Client;
@@ -150,5 +150,13 @@ impl TryFrom<ImageResponse> for HttpResponse {
                 panic!("Unsupported image format: {:?}", image_response.format);
             }
         }
+    }
+}
+
+pub fn auto_image_format(req: &HttpRequest) -> ImageFormat {
+    let accept: Option<&str> = req.headers().get("accept").and_then(|h| h.to_str().ok());
+    match accept {
+        Some(accept) if accept.contains("image/webp") => ImageFormat::WebP,
+        _ => ImageFormat::Png,
     }
 }

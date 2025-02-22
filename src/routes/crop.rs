@@ -1,8 +1,9 @@
-use crate::utils::http::{EmptyResponse, ImagePayload, ImageResponse};
-use actix_web::{get, web, HttpResponse, Result};
+use crate::utils::http::{auto_image_format, EmptyResponse, ImagePayload, ImageResponse};
+use actix_web::{get, web, HttpRequest, HttpResponse, Result};
 
 #[get("/crop/{x}/{y}/{width}/{height}")]
-pub async fn crop_image(
+pub async fn handler(
+    req: HttpRequest,
     params: web::Path<(u32, u32, u32, u32)>,
     payload: ImagePayload,
 ) -> Result<HttpResponse, EmptyResponse> {
@@ -10,7 +11,7 @@ pub async fn crop_image(
 
     ImageResponse {
         data: payload.image.clone().crop(x, y, width, height),
-        format: image::ImageFormat::Png,
+        format: auto_image_format(&req),
     }
     .try_into()
 }

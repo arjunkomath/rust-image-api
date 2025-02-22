@@ -1,8 +1,9 @@
-use crate::utils::http::{EmptyResponse, ImagePayload, ImageResponse};
-use actix_web::{get, web, HttpResponse, Result};
+use crate::utils::http::{auto_image_format, EmptyResponse, ImagePayload, ImageResponse};
+use actix_web::{get, web, HttpRequest, HttpResponse, Result};
 
 #[get("/blur/{sigma}")]
-pub async fn blur_image(
+pub async fn handler(
+    req: HttpRequest,
     sigma: web::Path<u32>,
     payload: ImagePayload,
 ) -> Result<HttpResponse, EmptyResponse> {
@@ -10,7 +11,7 @@ pub async fn blur_image(
 
     ImageResponse {
         data: payload.image.blur(sigma as f32),
-        format: image::ImageFormat::Png,
+        format: auto_image_format(&req),
     }
     .try_into()
 }

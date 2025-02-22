@@ -2,7 +2,7 @@ use crate::utils::http::{EmptyResponse, ImagePayload, ImageResponse};
 use actix_web::{get, web, HttpResponse, Result};
 
 #[get("/convert/{format}")]
-pub async fn convert_type(
+pub async fn handler(
     format: web::Path<String>,
     payload: ImagePayload,
 ) -> Result<HttpResponse, EmptyResponse> {

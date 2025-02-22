@@ -80,6 +80,7 @@ async fn main() -> Result<()> {
         App::new()
             .wrap(middleware::Logger::default())
             .wrap(middleware::DefaultHeaders::new().add(("X-Version", env!("CARGO_PKG_VERSION"))))
+            .wrap(middleware::Compress::default())
             .service(hello)
             .service(health)
             .service(test)
@@ -91,19 +92,19 @@ async fn main() -> Result<()> {
                             .service(routes::resize::resize_by_width)
                             .service(routes::resize::resize_by_height),
                     )
-                    .service(routes::convert::convert_type)
-                    .service(routes::crop::crop_image)
-                    .service(routes::flip::flip_orientation)
-                    .service(routes::blur::blur_image)
-                    .service(routes::grayscale::grayscale)
-                    .service(routes::invert::invert)
-                    .service(routes::brighten::brighten)
-                    .service(routes::unsharpen::unsharpen)
-                    .service(routes::rotate::rotate)
-                    .service(routes::next_image::next_image),
+                    .service(routes::convert::handler)
+                    .service(routes::crop::handler)
+                    .service(routes::flip::handler)
+                    .service(routes::blur::handler)
+                    .service(routes::grayscale::handler)
+                    .service(routes::invert::handler)
+                    .service(routes::brighten::handler)
+                    .service(routes::unsharpen::handler)
+                    .service(routes::rotate::handler)
+                    .service(routes::next_image::handler),
             )
     })
-    .bind(("0.0.0.0", port))?
+    .bind(("::", port))?
     .run()
     .await?;
 

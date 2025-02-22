@@ -1,12 +1,14 @@
-use crate::utils::http::{EmptyResponse, ImagePayload, ImageResponse};
-use actix_web::{get, HttpResponse};
-use image::ImageFormat;
+use crate::utils::http::{auto_image_format, EmptyResponse, ImagePayload, ImageResponse};
+use actix_web::{get, HttpRequest, HttpResponse};
 
 #[get("/grayscale")]
-pub async fn grayscale(payload: ImagePayload) -> Result<HttpResponse, EmptyResponse> {
+pub async fn handler(
+    req: HttpRequest,
+    payload: ImagePayload,
+) -> Result<HttpResponse, EmptyResponse> {
     ImageResponse {
         data: payload.image.grayscale(),
-        format: ImageFormat::Png,
+        format: auto_image_format(&req),
     }
     .try_into()
 }
