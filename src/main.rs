@@ -79,7 +79,7 @@ async fn main() -> Result<()> {
         .parse()
         .unwrap_or(8080);
 
-    println!("Starting image server on port {}", port);
+    println!("Starting image server on port {port}");
 
     HttpServer::new(|| {
         App::new()
