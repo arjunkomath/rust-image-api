@@ -11,7 +11,9 @@ use anyhow::Result;
 
 #[get("/")]
 async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("
+    HttpResponse::Ok()
+        .insert_header(CacheControl(vec![CacheDirective::NoCache]))
+        .body("
     USAGE
 
       GET /v1/resize/w/<max-width>?url=<image-url>
@@ -63,8 +65,11 @@ async fn health() -> impl Responder {
 
 #[get("/test")]
 async fn test() -> impl Responder {
-    fs::NamedFile::open("templates/test.html")
-        .unwrap_or_else(|_| panic!("Failed to open the HTML file"))
+    let file = fs::NamedFile::open("templates/test.html")
+        .unwrap_or_else(|_| panic!("Failed to open the HTML file"));
+
+    file.customize()
+        .insert_header(CacheControl(vec![CacheDirective::NoCache]))
 }
 
 #[actix_web::main]
