@@ -1,7 +1,7 @@
 # ---------------------------------------------------
 # 1 - Build Stage
 # ---------------------------------------------------
-FROM rust:1.85 as build
+FROM rust:1.93 AS build
 
 WORKDIR /usr/src/image-api
 COPY . .
