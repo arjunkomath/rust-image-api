@@ -9,7 +9,7 @@ use actix_web::{
 };
 use futures_util::future::LocalBoxFuture;
 
-use crate::utils::{self, http::EmptyResponse};
+use crate::utils::{self, http::ApiError};
 
 use super::http::ImagePayload;
 
@@ -58,9 +58,14 @@ where
             let image_url = web::Query::<utils::http::ImageSource>::from_query(req.query_string());
 
             if let Ok(image_url) = image_url {
-                let payload = ImagePayload::from_url(&image_url.url)
+                let client =
+                    req.app_data::<web::Data<reqwest::Client>>()
+                        .ok_or(ApiError::InternalError(
+                            "HTTP client not configured".to_string(),
+                        ))?;
+                let payload = ImagePayload::from_url(client, &image_url.url)
                     .await
-                    .map_err(|_| EmptyResponse {})?;
+                    .map_err(|e| ApiError::BadGateway(format!("Failed to fetch image: {e}")))?;
 
                 req.extensions_mut().insert(payload);
             }

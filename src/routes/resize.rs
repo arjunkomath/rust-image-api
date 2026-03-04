@@ -1,4 +1,4 @@
-use crate::utils::http::{EmptyResponse, ImagePayload, ImageResponse};
+use crate::utils::http::{ApiError, ImagePayload, ImageResponse};
 use actix_web::{get, web, HttpResponse, Result};
 use image::GenericImageView;
 
@@ -6,7 +6,7 @@ use image::GenericImageView;
 pub async fn resize_by_width(
     width: web::Path<u32>,
     payload: ImagePayload,
-) -> Result<HttpResponse, EmptyResponse> {
+) -> Result<HttpResponse, ApiError> {
     let image_width = width.into_inner();
 
     // Get the original dimensions
@@ -33,7 +33,7 @@ pub async fn resize_by_width(
 pub async fn resize_by_height(
     height: web::Path<u32>,
     payload: ImagePayload,
-) -> Result<HttpResponse, EmptyResponse> {
+) -> Result<HttpResponse, ApiError> {
     let image_height = height.into_inner();
 
     // Get the original dimensions

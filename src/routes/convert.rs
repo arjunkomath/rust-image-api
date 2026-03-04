@@ -1,11 +1,11 @@
-use crate::utils::http::{EmptyResponse, ImagePayload, ImageResponse};
+use crate::utils::http::{ApiError, ImagePayload, ImageResponse};
 use actix_web::{get, web, HttpResponse, Result};
 
 #[get("/convert/{format}")]
 pub async fn handler(
     format: web::Path<String>,
     payload: ImagePayload,
-) -> Result<HttpResponse, EmptyResponse> {
+) -> Result<HttpResponse, ApiError> {
     let format = format.into_inner();
 
     match format.as_str() {

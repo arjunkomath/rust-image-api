@@ -81,8 +81,11 @@ async fn main() -> Result<()> {
 
     println!("Starting image server on port {port}");
 
-    HttpServer::new(|| {
+    let client = reqwest::Client::new();
+
+    HttpServer::new(move || {
         App::new()
+            .app_data(web::Data::new(client.clone()))
             .wrap(middleware::Logger::default())
             .wrap(middleware::DefaultHeaders::new().add(("X-Version", env!("CARGO_PKG_VERSION"))))
             .wrap(middleware::Compress::default())

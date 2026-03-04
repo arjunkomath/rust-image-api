@@ -1,4 +1,4 @@
-use crate::utils::http::{auto_image_format, EmptyResponse, ImagePayload, ImageResponse};
+use crate::utils::http::{auto_image_format, ApiError, ImagePayload, ImageResponse};
 use actix_web::{get, web, HttpRequest, HttpResponse, Result};
 use image::GenericImageView;
 use serde::Deserialize;
@@ -14,7 +14,7 @@ pub async fn handler(
     req: HttpRequest,
     options: web::Query<ResizeOptions>,
     payload: ImagePayload,
-) -> Result<HttpResponse, EmptyResponse> {
+) -> Result<HttpResponse, ApiError> {
     let width = options.w;
     let height = options.h;
 

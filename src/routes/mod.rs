@@ -5,7 +5,7 @@ pub mod crop;
 pub mod flip;
 pub mod grayscale;
 pub mod invert;
+pub mod next_image;
 pub mod resize;
 pub mod rotate;
 pub mod unsharpen;
-pub mod next_image;

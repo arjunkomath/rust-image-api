@@ -1,4 +1,4 @@
-use crate::utils::http::{auto_image_format, EmptyResponse, ImagePayload, ImageResponse};
+use crate::utils::http::{auto_image_format, ApiError, ImagePayload, ImageResponse};
 use actix_web::{get, web, HttpRequest, HttpResponse, Result};
 
 #[get("/unsharpen/{sigma}/{threshold}")]
@@ -6,7 +6,7 @@ pub async fn handler(
     req: HttpRequest,
     params: web::Path<(f32, i32)>,
     payload: ImagePayload,
-) -> Result<HttpResponse, EmptyResponse> {
+) -> Result<HttpResponse, ApiError> {
     let (sigma, threshold) = params.into_inner();
 
     ImageResponse {

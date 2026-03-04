@@ -1,4 +1,4 @@
-use crate::utils::http::{auto_image_format, EmptyResponse, ImagePayload, ImageResponse};
+use crate::utils::http::{auto_image_format, ApiError, ImagePayload, ImageResponse};
 use actix_web::{get, web, HttpRequest, HttpResponse, Result};
 
 #[get("/rotate/{deg}")]
@@ -6,7 +6,7 @@ pub async fn handler(
     req: HttpRequest,
     deg: web::Path<String>,
     payload: ImagePayload,
-) -> Result<HttpResponse, EmptyResponse> {
+) -> Result<HttpResponse, ApiError> {
     let deg = deg.into_inner();
 
     let image = match deg.as_str() {
