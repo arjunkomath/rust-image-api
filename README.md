@@ -6,7 +6,7 @@ A fast image manipulation API that can modify images on the fly.
 
 Example: https://images.techulus.cloud/v1/resize/w/240?url=https://push.techulus.com/images/logo.png
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/zHlq1G?referralCode=rXEVYY)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.com/deploy/zHlq1G)
 
 ## Usage
 
