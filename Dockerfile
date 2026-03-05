@@ -1,7 +1,7 @@
 # ---------------------------------------------------
 # 1 - Build Stage
 # ---------------------------------------------------
-FROM rust:1.93 AS build
+FROM rust:1.93.1 AS build
 
 WORKDIR /usr/src/image-api
 COPY . .
@@ -11,7 +11,7 @@ RUN cargo install --path .
 # ---------------------------------------------------
 # 2 - Deploy Stage
 # ---------------------------------------------------
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 RUN apt-get update && apt-get install -y \
     libssl-dev \
