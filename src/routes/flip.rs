@@ -1,5 +1,5 @@
-use crate::utils::http::{auto_image_format, ApiError, ImagePayload, ImageResponse};
-use actix_web::{get, web, HttpRequest, HttpResponse, Result};
+use crate::utils::http::{ApiError, ImagePayload, ImageResponse, auto_image_format};
+use actix_web::{HttpRequest, HttpResponse, Result, get, web};
 
 #[get("/flip/{orientation}")]
 pub async fn handler(

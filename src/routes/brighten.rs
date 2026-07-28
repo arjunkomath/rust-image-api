@@ -1,5 +1,5 @@
-use crate::utils::http::{auto_image_format, ApiError, ImagePayload, ImageResponse};
-use actix_web::{get, web, HttpRequest, HttpResponse};
+use crate::utils::http::{ApiError, ImagePayload, ImageResponse, auto_image_format};
+use actix_web::{HttpRequest, HttpResponse, get, web};
 
 #[get("/brighten/{value}")]
 pub async fn handler(

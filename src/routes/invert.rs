@@ -1,5 +1,5 @@
-use crate::utils::http::{auto_image_format, ApiError, ImagePayload, ImageResponse};
-use actix_web::{get, HttpRequest, HttpResponse};
+use crate::utils::http::{ApiError, ImagePayload, ImageResponse, auto_image_format};
+use actix_web::{HttpRequest, HttpResponse, get};
 
 #[get("/invert")]
 pub async fn handler(req: HttpRequest, payload: ImagePayload) -> Result<HttpResponse, ApiError> {

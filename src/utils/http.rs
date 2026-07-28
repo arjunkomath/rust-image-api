@@ -1,52 +1,51 @@
 use actix_web::{
+    FromRequest, HttpRequest, HttpResponse,
     body::BoxBody,
     error,
-    http::header::{CacheControl, CacheDirective, ContentType, ETag, EntityTag},
-    FromRequest, HttpMessage, HttpRequest, HttpResponse,
+    http::header::{CacheControl, CacheDirective, ETag, EntityTag},
+    web,
 };
-use image::{DynamicImage, ImageFormat};
+use image::{DynamicImage, ImageFormat, ImageOutputFormat};
 use reqwest::Client;
 use serde::Deserialize;
-use std::{
-    future::{ready, Ready},
-    io::Cursor,
-};
+use std::{future::Future, io::Cursor, pin::Pin};
 
-#[derive(Deserialize, Debug, Clone)]
-pub struct ImageSource {
-    pub url: String,
+#[derive(Deserialize)]
+struct ImageSource {
+    url: String,
 }
 
-#[derive(Debug, Clone)]
 pub struct ImagePayload {
     pub image: DynamicImage,
 }
 
-impl ImagePayload {
-    pub async fn from_url(client: &Client, url: &str) -> anyhow::Result<Self> {
-        let response = client.get(url).send().await?;
-        let bytes = response.bytes().await?;
-        let image = image::load_from_memory(&bytes)?;
-
-        Ok(ImagePayload { image })
-    }
-}
-
 impl FromRequest for ImagePayload {
     type Error = ApiError;
-    type Future = Ready<Result<Self, Self::Error>>;
+    type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
-    fn from_request(req: &actix_web::HttpRequest, _: &mut actix_web::dev::Payload) -> Self::Future {
-        let value = req.extensions().get::<ImagePayload>().cloned();
+    fn from_request(req: &HttpRequest, _: &mut actix_web::dev::Payload) -> Self::Future {
+        let source = web::Query::<ImageSource>::from_query(req.query_string());
+        let client = req.app_data::<web::Data<Client>>().cloned();
 
-        let result = match value {
-            Some(v) => Ok(v),
-            None => Err(ApiError::BadRequest(
-                "Missing or invalid 'url' query parameter".to_string(),
-            )),
-        };
+        Box::pin(async move {
+            let source = source.map_err(|_| {
+                ApiError::BadRequest("Missing or invalid 'url' query parameter".to_string())
+            })?;
+            let client = client
+                .ok_or_else(|| ApiError::InternalError("HTTP client not configured".to_string()))?;
+            let response =
+                client.get(&source.url).send().await.map_err(|error| {
+                    ApiError::BadGateway(format!("Failed to fetch image: {error}"))
+                })?;
+            let bytes = response
+                .bytes()
+                .await
+                .map_err(|error| ApiError::BadGateway(format!("Failed to fetch image: {error}")))?;
+            let image = image::load_from_memory(&bytes)
+                .map_err(|error| ApiError::BadGateway(format!("Failed to fetch image: {error}")))?;
 
-        ready(result)
+            Ok(Self { image })
+        })
     }
 }
 
@@ -93,60 +92,27 @@ impl TryFrom<ImageResponse> for HttpResponse {
     type Error = ApiError;
 
     fn try_from(image_response: ImageResponse) -> Result<Self, ApiError> {
-        match image_response.format {
-            ImageFormat::Png => {
-                let mut bytes = Vec::new();
-                image_response
-                    .data
-                    .write_to(&mut Cursor::new(&mut bytes), image::ImageOutputFormat::Png)
-                    .map_err(|e| ApiError::InternalError(format!("Failed to encode image: {e}")))?;
-
-                let etag_value = format!("{:x}", md5::compute(&bytes));
-
-                Ok(HttpResponse::Ok()
-                    .content_type(ContentType::png())
-                    .insert_header(CacheControl(vec![CacheDirective::MaxAge(86400u32)]))
-                    .insert_header(ETag(EntityTag::new_strong(etag_value.to_owned())))
-                    .body(bytes))
-            }
-            ImageFormat::Jpeg => {
-                let mut bytes = Vec::new();
-                image_response
-                    .data
-                    .write_to(
-                        &mut Cursor::new(&mut bytes),
-                        image::ImageOutputFormat::Jpeg(100),
-                    )
-                    .map_err(|e| ApiError::InternalError(format!("Failed to encode image: {e}")))?;
-
-                let etag_value = format!("{:x}", md5::compute(&bytes));
-
-                Ok(HttpResponse::Ok()
-                    .content_type(ContentType::jpeg())
-                    .insert_header(CacheControl(vec![CacheDirective::MaxAge(86400u32)]))
-                    .insert_header(ETag(EntityTag::new_strong(etag_value.to_owned())))
-                    .body(bytes))
-            }
-            ImageFormat::WebP => {
-                let mut bytes = Vec::new();
-                image_response
-                    .data
-                    .write_to(&mut Cursor::new(&mut bytes), image::ImageOutputFormat::WebP)
-                    .map_err(|e| ApiError::InternalError(format!("Failed to encode image: {e}")))?;
-
-                let etag_value = format!("{:x}", md5::compute(&bytes));
-
-                Ok(HttpResponse::Ok()
-                    .content_type("image/webp")
-                    .insert_header(CacheControl(vec![CacheDirective::MaxAge(86400u32)]))
-                    .insert_header(ETag(EntityTag::new_strong(etag_value.to_owned())))
-                    .body(bytes))
-            }
+        let (format, content_type) = match image_response.format {
+            ImageFormat::Png => (ImageOutputFormat::Png, "image/png"),
+            ImageFormat::Jpeg => (ImageOutputFormat::Jpeg(100), "image/jpeg"),
+            ImageFormat::WebP => (ImageOutputFormat::WebP, "image/webp"),
             _ => Err(ApiError::BadRequest(format!(
                 "Unsupported image format: {:?}",
                 image_response.format
-            ))),
-        }
+            )))?,
+        };
+        let mut bytes = Vec::new();
+        image_response
+            .data
+            .write_to(&mut Cursor::new(&mut bytes), format)
+            .map_err(|e| ApiError::InternalError(format!("Failed to encode image: {e}")))?;
+        let etag = format!("{:x}", md5::compute(&bytes));
+
+        Ok(HttpResponse::Ok()
+            .content_type(content_type)
+            .insert_header(CacheControl(vec![CacheDirective::MaxAge(86400u32)]))
+            .insert_header(ETag(EntityTag::new_strong(etag)))
+            .body(bytes))
     }
 }
 

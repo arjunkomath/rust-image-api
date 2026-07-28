@@ -1,6 +1,5 @@
-use crate::utils::http::{auto_image_format, ApiError, ImagePayload, ImageResponse};
-use actix_web::{get, web, HttpRequest, HttpResponse, Result};
-use image::GenericImageView;
+use crate::utils::http::{ApiError, ImagePayload, ImageResponse, auto_image_format};
+use actix_web::{HttpRequest, HttpResponse, Result, get, web};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -15,28 +14,21 @@ pub async fn handler(
     options: web::Query<ResizeOptions>,
     payload: ImagePayload,
 ) -> Result<HttpResponse, ApiError> {
-    let width = options.w;
-    let height = options.h;
-
-    let (original_width, original_height) = payload.image.dimensions();
-
-    let resized_image = match (width, height) {
+    let resized_image = match (options.w, options.h) {
         (Some(width), Some(height)) => {
             payload
                 .image
                 .resize_exact(width, height, image::imageops::FilterType::Triangle)
         }
         (Some(width), None) => {
-            let new_height = (width as f32 * original_height as f32 / original_width as f32) as u32;
             payload
                 .image
-                .resize_exact(width, new_height, image::imageops::FilterType::Triangle)
+                .resize(width, u32::MAX, image::imageops::FilterType::Triangle)
         }
         (None, Some(height)) => {
-            let new_width = (height as f32 * original_width as f32 / original_height as f32) as u32;
             payload
                 .image
-                .resize_exact(new_width, height, image::imageops::FilterType::Triangle)
+                .resize(u32::MAX, height, image::imageops::FilterType::Triangle)
         }
         _ => payload.image,
     };

@@ -1,6 +1,5 @@
 use crate::utils::http::{ApiError, ImagePayload, ImageResponse};
-use actix_web::{get, web, HttpResponse, Result};
-use image::GenericImageView;
+use actix_web::{HttpResponse, Result, get, web};
 
 #[get("/w/{width}")]
 pub async fn resize_by_width(
@@ -8,19 +7,10 @@ pub async fn resize_by_width(
     payload: ImagePayload,
 ) -> Result<HttpResponse, ApiError> {
     let image_width = width.into_inner();
-
-    // Get the original dimensions
-    let (original_width, original_height) = payload.image.dimensions();
-
-    // Calculate the new height while maintaining the aspect ratio
-    let new_height = (image_width as f32 * original_height as f32 / original_width as f32) as u32;
-
-    // Resize the image
-    let resized_image = payload.image.resize_exact(
-        image_width,
-        new_height,
-        image::imageops::FilterType::Triangle,
-    );
+    let resized_image =
+        payload
+            .image
+            .resize(image_width, u32::MAX, image::imageops::FilterType::Triangle);
 
     ImageResponse {
         data: resized_image,
@@ -35,16 +25,8 @@ pub async fn resize_by_height(
     payload: ImagePayload,
 ) -> Result<HttpResponse, ApiError> {
     let image_height = height.into_inner();
-
-    // Get the original dimensions
-    let (original_width, original_height) = payload.image.dimensions();
-
-    // Calculate the new height while maintaining the aspect ratio
-    let new_width = (image_height as f32 * original_width as f32 / original_height as f32) as u32;
-
-    // Resize the image
-    let resized_image = payload.image.resize_exact(
-        new_width,
+    let resized_image = payload.image.resize(
+        u32::MAX,
         image_height,
         image::imageops::FilterType::Triangle,
     );

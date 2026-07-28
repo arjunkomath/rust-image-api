@@ -1,5 +1,5 @@
 use crate::utils::http::{ApiError, ImagePayload, ImageResponse};
-use actix_web::{get, web, HttpResponse, Result};
+use actix_web::{HttpResponse, Result, get, web};
 
 #[get("/convert/{format}")]
 pub async fn handler(
@@ -7,24 +7,15 @@ pub async fn handler(
     payload: ImagePayload,
 ) -> Result<HttpResponse, ApiError> {
     let format = format.into_inner();
+    let format = match format.as_str() {
+        "jpeg" => image::ImageFormat::Jpeg,
+        "webp" => image::ImageFormat::WebP,
+        _ => image::ImageFormat::Png,
+    };
 
-    match format.as_str() {
-        "png" => ImageResponse {
-            data: payload.image,
-            format: image::ImageFormat::Png,
-        },
-        "jpeg" => ImageResponse {
-            data: payload.image,
-            format: image::ImageFormat::Jpeg,
-        },
-        "webp" => ImageResponse {
-            data: payload.image,
-            format: image::ImageFormat::WebP,
-        },
-        _ => ImageResponse {
-            data: payload.image,
-            format: image::ImageFormat::Png,
-        },
+    ImageResponse {
+        data: payload.image,
+        format,
     }
     .try_into()
 }

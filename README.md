@@ -52,8 +52,8 @@ resize image to `<width>`x`<height>` pixels, without changing the aspect ratio
 
 ## Development
 
-Run `cargo make watch`
+Run `just run`. Use `just test` and `just clippy` to check changes.
 
 ## Deployment
 
-This project can be deployed using the provided Dockerfile
+Build the provided Dockerfile with `just docker-build`.

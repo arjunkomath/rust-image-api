@@ -1,59 +1,17 @@
 mod routes;
 mod utils;
 
-use actix_files as fs;
 use actix_web::{
-    get,
+    App, HttpResponse, HttpServer, Responder, get,
     http::header::{CacheControl, CacheDirective},
-    middleware, web, App, HttpResponse, HttpServer, Responder,
+    middleware, web,
 };
-use anyhow::Result;
 
 #[get("/")]
 async fn hello() -> impl Responder {
     HttpResponse::Ok()
         .insert_header(CacheControl(vec![CacheDirective::NoCache]))
-        .body("
-    USAGE
-
-      GET /v1/resize/w/<max-width>?url=<image-url>
-        resize image `<max-width>` pixels wide, without changing the aspect ratio
-
-      GET /v1/resize/h/<max-height>?url=<image-url>
-        resize image to `<max-height>` pixels tall, without changing the aspect ratio
-
-      GET /v1/crop/<x>/<y>/<width>/<height>?url=<image-url>
-        crop image to `<width>`x`<height>` pixels, starting from position (`<x>`, `<y>`)
-      
-      GET /v1/convert/<format>?url=<image-url>
-        convert image to `<format>` format
-        format: png, jpeg, webp
-
-      GET /v1/flip/<orientation>?url=<image-url>
-        flip image  to `<orientation>` orientation
-        orientation: horizontal, vertical
-
-      GET /v1/grayscale?url=<image-url>
-        convert image to grayscale
-
-      GET /v1/invert?url=<image-url>
-        invert image
-
-      GET /v1/brighten/<value>?url=<image-url>
-        brighten image by `<value>`, negative values decrease the brightness and positive values increase it
-
-      GET /v1/blur/<sigma>?url=<image-url>
-        blur image with `<sigma>` sigma (this is a slow endpoint and could potentially timeout)
-
-      GET /v1/rotate/<deg>?url=<image-url>
-        rotate image by `<deg>` degrees, degree can be 90, 180, 270
-
-      GET /v1/unsharpen/<sigma>/<threshold>?url=<image-url>
-        unsharpen image, sigma is the amount to blur the image by, threshold is a control of how much to sharpen
-
-      GET /v1/next?url=<image-url>&w=<width>&h=<height>
-        resize image to `<width>`x`<height>` pixels, without changing the aspect ratio
-    ")
+        .body(include_str!("../README.md"))
 }
 
 #[get("/health")]
@@ -65,18 +23,17 @@ async fn health() -> impl Responder {
 
 #[get("/test")]
 async fn test() -> impl Responder {
-    let file = fs::NamedFile::open("templates/test.html")
-        .unwrap_or_else(|_| panic!("Failed to open the HTML file"));
-
-    file.customize()
+    HttpResponse::Ok()
         .insert_header(CacheControl(vec![CacheDirective::NoCache]))
+        .content_type("text/html; charset=utf-8")
+        .body(include_str!("../templates/test.html"))
 }
 
 #[actix_web::main]
-async fn main() -> Result<()> {
+async fn main() -> std::io::Result<()> {
     let port: u16 = std::env::var("PORT")
-        .unwrap_or("8080".to_string())
-        .parse()
+        .ok()
+        .and_then(|port| port.parse().ok())
         .unwrap_or(8080);
 
     println!("Starting image server on port {port}");
@@ -94,7 +51,6 @@ async fn main() -> Result<()> {
             .service(test)
             .service(
                 web::scope("/v1")
-                    .wrap(utils::middleware::ImageParser)
                     .service(
                         web::scope("/resize")
                             .service(routes::resize::resize_by_width)
@@ -114,7 +70,5 @@ async fn main() -> Result<()> {
     })
     .bind(("::", port))?
     .run()
-    .await?;
-
-    Ok(())
+    .await
 }
