@@ -3,5 +3,4 @@
 target
 Dockerfile
 .dockerignore
-README.md
 fly.toml
